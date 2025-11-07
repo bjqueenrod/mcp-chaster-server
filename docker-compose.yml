@@ -8,7 +8,6 @@ services:
     ports:
       - "${PORT:-3000}:3000"
     environment:
-      - NODE_ENV=production
       - PORT=3000
       - MCP_AUTH_TOKEN=${MCP_AUTH_TOKEN}
       - CHASTER_API_TOKEN=${CHASTER_API_TOKEN}
@@ -23,7 +22,7 @@ services:
     networks:
       - mcp-network-python
     volumes:
-      # Pour le développement, décommenter la ligne suivante
+      # For development, uncomment the following line
       # - ./:/app:ro
 
 networks:
@@ -31,14 +30,6 @@ networks:
     driver: bridge
     name: chaster-mcp-python-network
 
-# Configuration pour développement avec reload automatique
-# Créer un fichier docker-compose.dev.yml avec:
-# 
-# version: '3.8'
-# services:
-#   chaster-mcp-python:
-#     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3000", "--reload"]
-#     environment:
-#       - NODE_ENV=development
-#     volumes:
-#       - ./:/app
+# Note: This server runs in production mode only.
+# For development with auto-reload, modify main.py to set reload=True
+# or run: uvicorn main:app --host 0.0.0.0 --port 3000 --reload

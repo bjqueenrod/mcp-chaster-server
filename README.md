@@ -104,27 +104,134 @@ In development mode, FastAPI automatically generates documentation:
 - `GET /health` - Server health check
 - `POST /mcp` - Main MCP endpoint (authenticated)
 
-## 🔧 Available Chaster MCP Tools
+## 🔧 Available Chaster MCP Tools (86 Total)
 
-The Python version supports all Chaster API tools:
+The Python version now supports **ALL 86 Chaster Public API endpoints**!
 
-### 📋 Lock Management
-- `get_locks` - List with filters (active/archived/all)
+> **Note**: The Chaster API has 114 total endpoints, but 28 are part of the Partner Extensions API specifically for extension developers. This server implements all 86 public user-facing endpoints.
+
+### 📋 Locks (18 tools)
+- `get_locks` - List locks with status filters
 - `get_lock_details` - Complete lock details
 - `archive_lock` / `archive_lock_keyholder` - Archive locks
 - `unlock_lock` - Permanent unlock
-
-### ⚙️ Control and Modification
 - `update_lock_time` - Duration modification
 - `freeze_lock` - Freeze/unfreeze lock
 - `update_lock_settings` - Display settings
-- `convert_to_self_lock` - Convert to self-lock
-
-### 📊 Information and Search
+- `update_max_limit_date` - Increase max limit date
+- `trust_keyholder` - Mark keyholder as trusted
 - `get_lock_combination` - Retrieve combination
 - `get_lock_history` - Activity history
-- `search_locks` - Advanced search with filters
-- `trust_keyholder` - Mark keyholder as trusted
+- `set_test_lock` - Mark as test lock
+- `get_user_public_locks` - Get user's public locks
+- `search_locks` - Advanced search
+- `get_lock_extension` - Extension information
+- `trigger_lock_extension_action` - Trigger extension action
+- `convert_to_self_lock` - Convert to self-lock
+
+### 🔨 Lock Creation (3 tools)
+- `create_lock` - Create a new lock
+- `edit_lock_extensions` - Edit lock extensions
+- `create_lock_from_shared` - Create from shared lock
+
+### 👤 Profile (7 tools)
+- `get_user_profile_by_id` - Get user by ID
+- `get_user_profile` - Get user by username
+- `get_user_profile_details` - Detailed profile
+- `get_badge_count` - User badge count
+- `update_profile_from_auth` - Update from auth server
+- `get_auth_profile` - Logged user info
+- `set_user_profile` - Update profile
+
+### 💬 Messaging (9 tools)
+- `find_conversation_by_user` - Find conversation
+- `create_conversation` - Start new conversation
+- `get_conversations` - List conversations
+- `add_message` - Send message
+- `get_conversation` - Get conversation details
+- `set_conversation_status` - Update status
+- `set_conversation_unread` - Set unread
+- `get_messages` - Get messages
+- `get_ignored_users` - List ignored users
+
+### 🔑 Keyholder (1 tool)
+- `search_locked_users` - Search locked users
+
+### 🔓 Shared Locks (11 tools)
+- `get_shared_locks` - List shared locks
+- `create_shared_lock` - Create shared lock
+- `get_shared_lock` - Get shared lock details
+- `update_shared_lock` - Update shared lock
+- `archive_shared_lock` - Archive shared lock
+- `get_shared_lock_tags` - Get all tags
+- `get_suggested_tags` - Get suggested tags
+- `check_favorite_shared_lock` - Check favorite status
+- `add_favorite_shared_lock` - Add to favorites
+- `remove_favorite_shared_lock` - Remove from favorites
+- `get_favorite_shared_locks` - List favorites
+
+### 🌐 Public Locks (4 tools)
+- `get_public_lock` - Get public lock
+- `get_lock_image` - Generate lock image
+- `search_public_locks` - Search public locks
+- `get_explore_categories` - Explore categories
+
+### 🤝 Session Offer (7 tools)
+- `create_keyholding_offer` - Create offer
+- `accept_keyholding_request` - Accept request
+- `get_keyholding_offer_status` - Get status
+- `get_offer_public_info` - Get offer info
+- `respond_to_keyholding_offer` - Accept/reject
+- `archive_keyholding_offer` - Archive offer
+- `get_keyholding_requests` - List requests
+
+### 🚫 Blocks (4 tools)
+- `get_blocked_users` - List blocked users
+- `block_user` - Block user
+- `get_block_interaction` - Check block status
+- `unblock_user` - Unblock user
+
+### 🧩 Extensions (1 tool)
+- `get_extensions` - List available extensions
+
+### 🔢 Combinations (2 tools)
+- `upload_combination_image` - Upload image
+- `create_code_combination` - Create code
+
+### ⚖️ Extensions - Penalties (4 tools)
+- `get_penalties` - List penalties
+- `get_penalty_session` - Get penalty session
+- `search_penalty_periods` - Search periods
+- `get_punishable_actions` - List actions
+
+### 🔓 Extensions - Temporary Opening (3 tools)
+- `get_temporary_combination` - Get combination
+- `set_temporary_combination` - Set combination
+- `get_action_log_combination` - Get from log
+
+### 📸 Extensions - Verification Picture (2 tools)
+- `submit_verification_picture` - Submit picture
+- `get_verification_pictures` - Get history
+
+### 📁 Files (2 tools)
+- `upload_files` - Upload attachments
+- `get_file` - Get file by key
+
+### 👥 Users (4 tools)
+- `search_users` - Search users
+- `search_user_by_username` - Search by username
+- `search_user_by_discord` - Search by Discord ID
+- `update_current_user` - Update current user
+
+### 🎉 Community Events (2 tools)
+- `get_event_categories` - Event categories
+- `get_event_task_details` - Task details
+
+### ⚙️ Settings (1 tool)
+- `get_app_settings` - Application settings
+
+### 🚨 Reports (1 tool)
+- `create_report` - Create report
 
 ## 🧪 Testing and Validation
 
@@ -305,7 +412,24 @@ async def handle_request(self, method: str, endpoint: str, data: Optional[Dict] 
 
 ---
 
-**Version:** 1.0.0 | **License:** MIT | **Python:** 3.11+ | **FastAPI:** 0.104+
+**Version:** 2.0.0 | **License:** MIT | **Python:** 3.11+ | **FastAPI:** 0.104+
+
+## 🆕 Version 2.0.0 - Complete API Coverage
+
+**What's New:**
+- ✨ **ALL 86 Chaster Public API endpoints** now implemented (was 13)
+- 📦 **73 new tools** added covering:
+  - Profile management and user search
+  - Complete messaging system
+  - Shared and public locks management
+  - Keyholding offers and session management
+  - User blocking and reporting
+  - Extensions (penalties, temporary opening, verification)
+  - File uploads and combinations
+  - Community events
+- 🏗️ **Maintained architecture**: Same async HTTP structure
+- 🔄 **Backward compatible**: All original 13 tools work the same way
+- 📚 **Complete documentation**: All tools documented in README and Swagger
 
 ---
 
@@ -615,4 +739,21 @@ async def handle_request(self, method: str, endpoint: str, data: Optional[Dict] 
 
 ---
 
-**Version:** 1.0.0 | **Licence:** MIT | **Python:** 3.11+ | **FastAPI:** 0.104+
+**Version:** 2.0.0 | **Licence:** MIT | **Python:** 3.11+ | **FastAPI:** 0.104+
+
+## 🆕 Version 2.0.0 - Couverture complète de l'API
+
+**Nouveautés:**
+- ✨ **TOUS les 86 endpoints de l'API publique Chaster** maintenant implémentés (était 13)
+- 📦 **73 nouveaux outils** ajoutés couvrant:
+  - Gestion des profils et recherche d'utilisateurs
+  - Système de messagerie complet
+  - Gestion des verrous partagés et publics
+  - Offres de gardiennage et gestion de session
+  - Blocage d'utilisateurs et signalements
+  - Extensions (pénalités, ouverture temporaire, vérification)
+  - Upload de fichiers et combinaisons
+  - Événements communautaires
+- 🏗️ **Architecture préservée**: Même structure HTTP async
+- 🔄 **Rétrocompatible**: Les 13 outils originaux fonctionnent de la même manière
+- 📚 **Documentation complète**: Tous les outils documentés dans README et Swagger

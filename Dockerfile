@@ -1,51 +1,50 @@
 
-# Utilise Python 3.11 slim pour optimiser la taille
+# Use Python 3.11 slim to optimize image size
 FROM python:3.11-slim
 
-# Définit le répertoire de travail
+# Set working directory
 WORKDIR /app
 
-# Variables d'environnement pour optimiser Python
+# Environment variables to optimize Python
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PIP_NO_CACHE_DIR=1
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Installe les dépendances système nécessaires
+# Install required system dependencies
 RUN apt-get update && apt-get install -y \
     wget \
     && rm -rf /var/lib/apt/lists/*
 
-# Copie et installe les dépendances Python
+# Copy and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copie le code source
+# Copy source code
 COPY *.py ./
 
-# Crée un utilisateur non-root pour la sécurité
+# Create non-root user for security
 RUN addgroup --system --gid 1001 appgroup && \
     adduser --system --uid 1001 --gid 1001 appuser
 
-# Change le propriétaire des fichiers
+# Change file ownership
 RUN chown -R appuser:appgroup /app
 USER appuser
 
-# Expose le port
+# Expose port
 EXPOSE 3000
 
-# Variables d'environnement par défaut
-ENV NODE_ENV=production
+# Default environment variables
 ENV PORT=3000
 
-# Commande de santé pour Docker
+# Docker health check command
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
 
-# Commande de démarrage
+# Startup command
 CMD ["python", "main.py"]
 
-# Labels pour la documentation
+# Labels for documentation
 LABEL maintainer="MCP Server Python"
 LABEL version="1.0.0"
 LABEL description="Chaster Locks MCP Server - Python FastAPI"
