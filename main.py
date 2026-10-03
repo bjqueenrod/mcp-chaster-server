@@ -2,10 +2,10 @@
 import os
 import json
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Union
 from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 import uvicorn
 from dotenv import load_dotenv
@@ -23,14 +23,14 @@ logger = logging.getLogger(__name__)
 class JsonRpcRequest(BaseModel):
     jsonrpc: str = "2.0"
     method: str
-    params: Dict[str, Any] = Field(default_factory=dict)
-    id: Optional[int] = None
+    params: Optional[Union[Dict[str, Any], List[Any]]] = None
+    id: Optional[Union[int, str]] = None
 
 class JsonRpcResponse(BaseModel):
     jsonrpc: str = "2.0"
     result: Optional[Any] = None
     error: Optional[Dict[str, Any]] = None
-    id: Optional[int] = None
+    id: Optional[Union[int, str]] = None
 
 class JsonRpcError(BaseModel):
     code: int
@@ -144,14 +144,16 @@ logger.info(f"🔑 Expected token: {MCP_AUTH_TOKEN[:4]}...{MCP_AUTH_TOKEN[-4:]}"
 # Chaster service
 chaster_service = ChasterLocksService()
 
-def create_jsonrpc_response(result: Any = None, request_id: Optional[int] = None) -> JsonRpcResponse:
-    """Create a valid JSON-RPC response"""
-    return JsonRpcResponse(result=result, id=request_id)
+def create_jsonrpc_response(result: Any = None, request_id: Optional[Union[int, str]] = None) -> JSONResponse:
+    """Create a valid JSON-RPC response (success: `result` only, never `error`)"""
+    return JSONResponse({"jsonrpc": "2.0", "id": request_id, "result": result if result is not None else {}})
 
-def create_jsonrpc_error(code: int, message: str, request_id: Optional[int] = None, data: Any = None) -> JsonRpcResponse:
-    """Create a JSON-RPC error"""
-    error = JsonRpcError(code=code, message=message, data=data)
-    return JsonRpcResponse(error=error.dict(), id=request_id)
+def create_jsonrpc_error(code: int, message: str, request_id: Optional[Union[int, str]] = None, data: Any = None) -> JSONResponse:
+    """Create a JSON-RPC error (error: `error` only, never `result`)"""
+    error = {"code": code, "message": message}
+    if data is not None:
+        error["data"] = data
+    return JSONResponse({"jsonrpc": "2.0", "id": request_id, "error": error})
 
 async def verify_token(request: Request):
     """Verify MCP authentication token (supports both 'Bearer TOKEN' and 'TOKEN' formats)"""
@@ -263,6 +265,12 @@ async def handle_mcp(
 
     logger.info(f"📡 MCP request: {rpc_request.method}")
 
+    # Notifications get no JSON-RPC response body (HTTP 202 per MCP streamable-HTTP)
+    if rpc_request.method.startswith("notifications/"):
+        return Response(status_code=202)
+
+    params = rpc_request.params if isinstance(rpc_request.params, dict) else {}
+
     try:
         if rpc_request.method == "initialize":
             result = {
@@ -287,8 +295,8 @@ async def handle_mcp(
             return create_jsonrpc_response(result, rpc_request.id)
 
         elif rpc_request.method == "tools/call":
-            tool_name = rpc_request.params.get("name")
-            tool_args = rpc_request.params.get("arguments", {})
+            tool_name = params.get("name")
+            tool_args = params.get("arguments", {})
 
             if not tool_name:
                 return create_jsonrpc_error(
@@ -299,6 +307,15 @@ async def handle_mcp(
 
             result = await chaster_service.call_tool(tool_name, tool_args)
             return create_jsonrpc_response(result, rpc_request.id)
+
+        elif rpc_request.method == "ping":
+            return create_jsonrpc_response({}, rpc_request.id)
+
+        elif rpc_request.method == "resources/list":
+            return create_jsonrpc_response({"resources": []}, rpc_request.id)
+
+        elif rpc_request.method == "prompts/list":
+            return create_jsonrpc_response({"prompts": []}, rpc_request.id)
 
         else:
             return create_jsonrpc_error(-32601, "Method not found", rpc_request.id)
