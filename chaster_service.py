@@ -1453,7 +1453,7 @@ class ChasterLocksService:
     async def search_locked_users(self, query: str = None, limit: int = None) -> Dict[str, Any]:
         payload = {}
         if query:
-            payload["query"] = query
+            payload["search"] = query  # the API field is "search"; "query" is rejected with a 400
         if limit:
             payload["limit"] = limit
         data = await self.handle_request("POST", "/keyholder/locks/search", payload)
@@ -1611,7 +1611,7 @@ class ChasterLocksService:
         return self.format_response(data, "Users search results")
 
     async def search_user_by_username(self, username: str) -> Dict[str, Any]:
-        data = await self.handle_request("POST", "/users/search/by-username", {"username": username})
+        data = await self.handle_request("POST", "/users/search/by-username", {"search": username})
         return self.format_response(data, f"Search results for username {username}")
 
     async def search_user_by_discord(self, discord_id: str) -> Dict[str, Any]:
